@@ -13,3 +13,7 @@ source .venv\bin\activate
 pip install -r requirements.txt
 python s3-block.py
 ```
+
+## Preview
+
+![alt text](screenshot.png)
