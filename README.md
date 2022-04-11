@@ -1,5 +1,8 @@
 # s3-remove-public-access
 
+This script will enable the public blocks for all S3 buckets in an AWS account.  
+So make sure you don't have any static website hosting buckets because this will remove access.
+
 ## Requirements
 
 - boto3
