@@ -20,3 +20,8 @@ python s3-block.py
 ## Preview
 
 ![alt text](screenshot.png)
+
+## FAQ
+
+Q. Why not just use the S3 option to block all public access at the account level?  
+A. That does work but some scanners (and maybe AWS Security Hub) still check the bucket level for these settings.
