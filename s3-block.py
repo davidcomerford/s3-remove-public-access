@@ -87,8 +87,8 @@ def main():
             print("\nComplete")
             exit()
         elif answer == "no": 
-            exit()
             print("Bye")
+            exit()
         else: 
             print("Please enter yes or no.")
 
