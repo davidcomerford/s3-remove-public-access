@@ -5,7 +5,7 @@ from rich.live import Live
 from rich import print
 from rich.progress import track
 
-aws_profile = "default"
+s3_client = ""
 
 def set_colour(setting):
     if setting == False:
@@ -15,24 +15,34 @@ def set_colour(setting):
     return setting
 
 def do_updates(buckets):
-    print(len(buckets))
-    for n in track(range(n), description="Processing..."):
-        pass
+    global s3_client
+    for bucket in track(buckets, description="Updating..."):
+        s3_client.put_public_access_block(
+            Bucket=bucket['Name'],
+            PublicAccessBlockConfiguration={
+                'BlockPublicAcls': True,
+                'IgnorePublicAcls': True,
+                'BlockPublicPolicy': True,
+                'RestrictPublicBuckets': True
+            }
+        )
     return
 
 def main():
+    global s3_client
+    waiting_for_answer = True
+
     # Prompt for AWS profile to use
     aws_profile = input("Enter AWS_PROFILE name to use, or leave empty for default: ")
     if not aws_profile:
-        aws_session = boto3.Session()#profile_name=aws_profile)
+        aws_session = boto3.Session()
     else:
         aws_session = boto3.Session(profile_name=aws_profile)
     
     s3_client = aws_session.client('s3')
-    looping = True
 
     # Setup table
-    table = Table(title="Buckets")
+    table = Table()
     table.add_column("Bucket Name", justify="left", style="cyan", no_wrap=True)
     table.add_column("BlockPublicAcls", justify="left")
     table.add_column("IgnorePublicAcls", justify="left")
@@ -54,10 +64,10 @@ def main():
                 block_public_policy = public_configurations.get('BlockPublicPolicy')
                 restrict_public_buckets = public_configurations.get('RestrictPublicBuckets')
             except:
-                block_public_acls = "No config"
-                ignore_public_acls = "No config"
-                block_public_policy = "No config"
-                restrict_public_buckets = "No config"
+                block_public_acls = "Unset"
+                ignore_public_acls = "Unset"
+                block_public_policy = "Unset"
+                restrict_public_buckets = "Unset"
                 pass
 
             # Add the row
@@ -70,13 +80,15 @@ def main():
                 )
 
     print("")
-    while(looping):
+    while(waiting_for_answer):
         answer = input("Apply changes to all buckets? [yes/no] ")
         if answer == "yes": 
-            looping = False
             do_updates(allbuckets)
+            print("\nComplete")
+            exit()
         elif answer == "no": 
             exit()
+            print("Bye")
         else: 
             print("Please enter yes or no.")
 
